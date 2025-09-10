@@ -12,7 +12,7 @@ Download: 93.21 Mbit/s
 Upload: 42.11 Mbit/s
 ```
 
-#### Jei norim stebėti išorines užklausas į savo Nginx serverį (ypač bandymus pasiekti .env, .git, ar kitus jautrius failus), štai keletas būdų, kaip tai padaryti efektyviai:
+#### Jei norim stebėti išorines užklausas Nginx serverį (ypač bandymus pasiekti .env, .git, ar kitus jautrius failus)
 
 📄 1. Peržiūrėk Nginx log'us
 🔍 Access log – rodo visas užklausas
