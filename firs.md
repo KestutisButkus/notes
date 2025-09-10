@@ -33,4 +33,32 @@ sudo tail -f /var/log/nginx/error.log
 
 
 
+Jei nori filtruoti tik įtartinas užklausas realiu laiku iš access.log, gali naudoti grep kartu su tail -f. Štai keletas pavyzdžių, kurie padės tau stebėti galimus bandymus pasiekti jautrius failus:
+
+🔍 Stebėti .env, .git, .config ir kitus pavojingus taikinius
+```
+sudo tail -f /var/log/nginx/access.log | grep -Ei "\.env|\.git|config|passwd|\.ht|\.bak"
+
+
+- -f – stebi failą realiu laiku
+- grep -Ei – ieško nepriklausomai nuo raidžių dydžio (-i) ir leidžia naudoti regex (-E)
+- Regex – ieško .env, .git, config, passwd, .htaccess, .bak ir pan.
+
+📌 Jei nori matyti IP adresus, kurie daro šias užklausas
+sudo tail -f /var/log/nginx/access.log | grep -Ei "\.env|\.git|config" | awk '{print $1}'
+
+
+Tai ištrauks IP adresus, kurie bando pasiekti pavojingus failus.
+
+🧠 Patarimas: sukurk alias komandą
+Kad nereikėtų vis iš naujo rašyti ilgos komandos, gali ją pridėti į .bashrc:
+alias nginxwatch='sudo tail -f /var/log/nginx/access.log | grep -Ei "\.env|\.git|config|passwd|\.ht|\.bak"'
+
+
+Tada tiesiog paleisk:
+nginxwatch
+
+
+
+Jei nori, galim sukurti skriptą, kuris automatiškai užblokuoja IP, jei jie bando pasiekti .env ar .git. Ar norėtum tokio automatinio apsaugos mechanizmo?
 
