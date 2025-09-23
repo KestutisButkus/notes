@@ -80,7 +80,33 @@ find "$BACKUP_DIR" -type f -mtime +7 -name "*.sql" -delete
 ```
 chmod +x /home/as/backup_pg.sh
 ```
+# arba
+```
+sudo chmod +x /home/as/backup_pg.sh
+```
+# Patikrinimas
+```
+/home/as/backup_pg.sh
+```
+Tada patikrink /home/as/db_backups/ ar atsirado failas su dabartine data.
+---
 # Sukuriame cron job
+Kaip patikrinti, ar  yra įdiegtas
+```
+dpkg -l | grep cron
+```
+Jei nieko negrąžina —  nėra įdiegtas.
+🛠️ Kaip įdiegti  ir 
+```
+sudo apt update
+sudo apt install cron
+```
+Po to paleisk ir aktyvuok servisą:
+```
+sudo systemctl enable cron
+sudo systemctl start cron
+```
+Ir tada  turėtų veikti be problemų.
 
 Redaguok cron užduotis naudodamas crontab -e:
 ```
@@ -92,18 +118,71 @@ Galima nukreipti output į log failą:
 ```
 0 4 * * * /home/as/backup_pg.sh >> /home/as/db_backups/backup.log 2>&1
 ```
-# Patikrinimas
-```
-/home/as/backup_pg.sh
+#### Arba galoma naudoti Ubuntu inregruotą "systemd":
+`systemd timers`, yra modernesni ir lankstesni nei `cron`. Sukurti du failus, kad skriptas `/home/as/backup_pg.sh` būtų paleidžiamas **kasdien 4:00 ryte**:
+
+>📁 1. Sukuriame `backup_pg.service`
+
+```bash
+sudo nano /etc/systemd/system/backup_pg.service
 ```
 
-Tada patikrink /home/as/db_backups/ ar atsirado failas su dabartine data.
+Įklijuojame:
+
+```ini
+[Unit]
+Description=PostgreSQL atsarginės kopijos skriptas
+
+[Service]
+Type=oneshot
+ExecStart=/home/as/backup_pg.sh
+```
+
+> ✅ `Type=oneshot` reiškia, kad skriptas bus paleistas vieną kartą ir baigsis.
+
+>⏰ 2. Sukuriame `backup_pg.timer`
+
+```bash
+sudo nano /etc/systemd/system/backup_pg.timer
+```
+
+Įklijuojame:
+
+```ini
+[Unit]
+Description=Kasdien 4:00 paleisti PostgreSQL atsarginę kopiją
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+> ✅ `Persistent=true` reiškia, kad jei kompiuteris buvo išjungtas 4:00, skriptas bus paleistas kitą kartą įjungus.
+
+>🚀 3. Aktyvuok laikmatį
+
+```bash
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable --now backup_pg.timer
+```
+>🔍 4. Patikrink statusą
+
+```bash
+systemctl list-timers --all | grep backup_pg
+systemctl status backup_pg.timer
+journalctl -u backup_pg.service
+```
+---
 
 ### 💡 Papildoma rekomendacija:
 Jei duomenų bazė didelė, galima naudoti pg_dump -Fc formatu (custom dump), tada restore daroma su pg_restore.
 Jei serveris veikia su Docker ar kitomis aplinkomis, reikia atitinkamai koreguoti komandas.
 
-# ✅ – skripte, kuris daro atsarginę kopiją, reikia naudoti tuos pačius DB autentifikacijos duomenis, kurie veikia tavo Django projekte, t. y.:
+## – skripte, kuris daro atsarginę kopiją, reikia naudoti tuos pačius DB autentifikacijos duomenis, kurie veikia tavo Django projekte, t. y.:
 
 1. Vartotojo vardą (DB_USER) – tas pats, kurį naudoja Django settings.py DATABASES['default']['USER'].
 
