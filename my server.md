@@ -60,21 +60,33 @@ journalctl -u skaps.service -f
 Skriptas:
 Sukuriame failą, pvz., /home/as/backup_pg.sh:
 ```
+#!/bin/bash
+
 # Nustatymai
-DB_NAME="skaps_db"                   # tavo DB pavadinimas
-DB_USER="skaps_user"                 # DB vartotojas
-DB_HOST="localhost"                  # jei serveris lokaliai
-BACKUP_DIR="/home/as/db_backups"     # kur bus saugomos kopijos
-DATE=$(date +"%Y-%m-%d_%H-%M-%S")   # datos žyma failo pavadinime
+DB_NAME="*"
+DB_USER="*"
+DB_HOST="localhost"
+DB_PASSWORD="*"
+BACKUP_DIR="/home/as/db_backups"
+LOG_FILE="/home/as/backup_log.txt"
+DATE=$(date +"%Y-%m-%d_%H-%M-%S")
+BACKUP_FILE="${BACKUP_DIR}/${DB_NAME}_${DATE}.sql"
 
 # Sukuriam katalogą jei neegzistuoja
 mkdir -p "$BACKUP_DIR"
 
 # Atliekam dump
-PGPASSWORD="tavo_slaptazodis" pg_dump -U $DB_USER -h $DB_HOST $DB_NAME > "$BACKUP_DIR/${DB_NAME}_$DATE.sql"
+export PGPASSWORD="$DB_PASSWORD"
+if pg_dump -U "$DB_USER" -h "$DB_HOST" "$DB_NAME" > "$BACKUP_FILE"; then
+    echo "$(date) – :) Backup sėkmingai sukurta: $BACKUP_FILE" >> "$LOG_FILE"
+else
+    echo "$(date) – !!! Klaida kuriant backup: $BACKUP_FILE" >> "$LOG_FILE"
+fi
+unset PGPASSWORD
 
-# (Pasirinktinai) išvalom senas kopijas, pvz. palikti tik paskutines 7 dienas
-find "$BACKUP_DIR" -type f -mtime +7 -name "*.sql" -delete
+# Paliekam tik paskutines 30 dienų kopijas
+DAYS_TO_KEEP=30
+find "$BACKUP_DIR" -type f -name "*.sql" -mtime +"$DAYS_TO_KEEP" -exec rm {} \;
 ```
 # Padarom skriptą vykdomu:
 ```
