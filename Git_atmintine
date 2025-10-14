@@ -1,38 +1,3 @@
-GIT KOMANDŲ ATMINTINĖ
-
-🔧 Bazinės komandos
-- git init — sukuria naują Git saugyklą
-- git clone <url> — nukopijuoja esamą saugyklą
-- git status — parodo dabartinę būseną
-- git add <failas> — pažymi failą commit'ui
-- git commit -m "žinutė" — išsaugo pakeitimus su aprašymu
-- git log — rodo commit'ų istoriją
-
-🌐 Darbas su nuotoline saugykla
-- git remote -v — parodo nuotolinių saugyklų adresus
-- git push — išsiunčia pakeitimus į nuotolinę saugyklą
-- git pull — atsisiunčia ir sujungia naujausius pakeitimus
-- git fetch — atsisiunčia pakeitimus be sujungimo
-
-🌿 Darbas su šakomis
-- git branch — parodo esamas šakas
-- git branch <pavadinimas> — sukuria naują šaką
-- git checkout <šaka> — persijungia į kitą šaką
-- git merge <šaka> — sujungia šaką su dabartine
-
-🧹 Konfliktų ir valymo komandos
-- git diff — parodo pakeitimus tarp versijų
-- git reset <failas> — pašalina failą iš staging
-- git stash — laikinai išsaugo pakeitimus
-- git stash pop — grąžina pakeitimus iš stash
-
-📁 Papildoma
-- .gitignore — failas, kuriame nurodoma, ką Git turi ignoruoti
-- git config --global user.name "Vardas" — nustato naudotojo vardą
-- git config --global user.email "el.paštas" — nustato naudotojo el. paštą
-
-
-
 # Git komandų atmintinė
 
 ## Bazinės komandos
