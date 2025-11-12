@@ -1,17 +1,18 @@
-Puiku, Kęstuti — tavo pateiktame „Group Policy Editor“ lange jau aktyvuotas **„Turn off auto-restart for updates during active hours“**, o tai reiškia, kad sistema neperkraus kompiuterio aktyviu metu. Tačiau jei nori **visiškai išjungti automatinį perkrovimą ir palikti tik pranešimą**, reikia dar vieno žingsnio, kurio šiuo metu nematau tarp tavo politikų:
+
 
 ---
 
-### 🔍 Trūkstama politika:  
-**„No auto-restart with logged on users for scheduled automatic updates installations“**
+### Norint **visiškai išjungti automatinį perkrovimą ir palikti tik pranešimą**
+reikia aktyvuoti **„No auto-restart with logged on users for scheduled automatic updates installations“**
+
+Grupės politikoje eiti į:
+   **Computer Configuration → Administrative Templates → Windows Components → Windows Update → Legacy Polices**
 
 Ši politika **visiškai blokuoja automatinį perkrovimą**, jei vartotojas yra prisijungęs, nepriklausomai nuo aktyvių valandų. Ji veikia kartu su pranešimų sistema, todėl vartotojas matys įspėjimą, bet perkrovimas neįvyks automatiškai.
 
 ---
 
-### 🛠️ Kaip ją pridėti rankiniu būdu per registrą
-
-Kadangi jos nematai tarp politikų, gali ją įjungti per registrą:
+### 🛠️ Pridėjimas rankiniu būdu per registrą
 
 1. Paspausk `Win + R`, įvesk `regedit` → Enter.
 2. Eik į:
@@ -31,9 +32,9 @@ Kadangi jos nematai tarp politikų, gali ją įjungti per registrą:
 
 Kad vartotojas tikrai matytų įspėjimą:
 
-- Eik į **Settings → System → Notifications**.
-- Įsitikink, kad **Windows Update notifications** yra įjungtos.
-- Galima papildomai aktyvuoti politiką **„Display options for update notifications“**, jei nori valdyti pranešimų elgseną.
+- Einam į **Settings → System → Notifications**.
+- Įsitikinam, kad **Windows Update notifications** yra įjungtos.
+- Galima papildomai aktyvuoti politiką **„Display options for update notifications“**.
 
 ---
 
@@ -42,9 +43,6 @@ Kad vartotojas tikrai matytų įspėjimą:
 - **Automatinis perkrovimas išjungtas visam laikui**, net jei atnaujinimas įdiegtas.
 - **Vartotojas informuojamas**, bet sprendimą dėl perkrovimo priima pats.
 - **Saugus sprendimas serveriams ir darbo stotims**, kur netikėtas perkrovimas gali sukelti problemų.
-
-Jei nori, galiu paruošti `.reg` failą arba PowerShell skriptą, kuris tai pritaiko automatiškai. Pasakyk, jei norėtum tokio sprendimo.
-
 
 ### 🔧 Kaip užtikrinti, kad veiktų?
 
@@ -58,61 +56,18 @@ Jei nori, galiu paruošti `.reg` failą arba PowerShell skriptą, kuris tai prit
    - Kad vartotojas matytų, jog reikia perkrauti.
 
 ---
-Puiku, Kęstuti — tai **būtent ta politika**, kurios tau reikia norint **visiškai išjungti automatinį perkrovimą ir palikti tik pranešimą vartotojui**.
 
-### ✅ „No auto-restart with logged on users for scheduled automatic updates installations“
-
-Kai ši politika nustatyta kaip **Enabled**:
-
-- 💡 **Automatinis perkrovimas neįvyks**, jei vartotojas yra prisijungęs.
-- 🔔 **Vartotojas gaus pranešimą**, kad reikia perkrauti kompiuterį rankiniu būdu.
-- 🧠 **Atnaujinimai nebus aktyvuoti**, kol vartotojas pats neperkraus sistemos.
-
----
-
-### ⚠️ Svarbi pastaba
-
-Kaip teisingai pastebėjai, ši politika veikia **tik jei „Configure Automatic Updates“ yra aktyvuota**. Kad ji turėtų efektą, reikia:
-
-1. Grupės politikoje eiti į:
-   **Computer Configuration → Administrative Templates → Windows Update**
-2. Atidaryti **Configure Automatic Updates**.
-3. Pasirinkti **Enabled**.
-4. Nustatyti, pvz., **Auto download and notify for install** (arba kitą tau tinkamą režimą).
-
-Tik tada „No auto-restart…“ politika bus taikoma.
-
----
-
-### 🧠 Ką tai reiškia tavo atveju?
-
-Kadangi valdai sistemą, kur svarbu išvengti netikėtų perkrovimų (pvz., serveriai, dokumentacijos redagavimas, mokėjimų UX), šis derinys:
-
-- **Configure Automatic Updates → Enabled**
-- **No auto-restart with logged on users → Enabled**
-
-…leidžia tau **išlaikyti pilną kontrolę**: atnaujinimai įdiegiami, bet perkrovimas vyksta tik tada, kai tu nusprendi.
-
-Jei nori, galiu paruošti `.reg` arba PowerShell skriptą, kuris tai pritaiko automatiškai. Ar norėtum tokio sprendimo?
-
-
-### 🧩 Alternatyva: registro reikšmė
-
-Jei nori tai pritaikyti ir „Windows Home“ versijoje:
-
-```reg
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU]
-"NoAutoRebootWithLoggedOnUsers"=dword:00000001
-```
-
-Tai veikia identiškai ir yra palaikoma „Windows 11“.
-
----
 **Štai PowerShell skriptas, kuris išjungia automatinį perkrovimą po „Windows Update“ ir palieka tik pranešimą vartotojui. Jis veikia tiek „Windows 11 Pro“, tiek „Home“ versijose.**
 
 ---
 
 ### 🧩 PowerShell skriptas: `Disable-AutoRestart.ps1`
+
+Sukuriame failą:
+
+'''
+Disable-AutoRestart.ps1
+'''
 
 ```powershell
 # Patikrina, ar skriptas vykdomas kaip administratorius
@@ -138,11 +93,10 @@ Write-Host "✅ Automatinis perkrovimas išjungtas. Vartotojas gaus tik praneši
 
 ### 🛠️ Kaip naudoti
 
-1. Atidaryk **PowerShell kaip administratorius**.
-2. Įklijuok skriptą tiesiai į langą arba išsaugok kaip `Disable-AutoRestart.ps1`.
-3. Paleisk skriptą:
+1. Atidarom **PowerShell kaip administratorius**.
+2. Paleidžiam skriptą:
    ```powershell
-   .\Disable-AutoRestart.ps1
+   Disable-AutoRestart.ps1
    ```
 
 ---
@@ -159,23 +113,3 @@ Write-Host "✅ Automatinis perkrovimas išjungtas. Vartotojas gaus tik praneši
   ```
 - Tai **užtikrina, kad „Windows“ neperkraus kompiuterio automatiškai**, jei vartotojas yra prisijungęs.
 - **Pranešimas apie perkrovimą vis tiek bus rodomas**, todėl vartotojas žinos, kad reikia perkrauti rankiniu būdu.
-
----
-
-### 📌 Papildoma rekomendacija
-
-Jei nori dar daugiau kontrolės, gali pridėti ir šiuos papildomus PowerShell veiksmus:
-
-```powershell
-# Nustatyti aktyvias valandas (pvz., 08:00–23:00)
-$startHour = 8
-$endHour = 23
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "ActiveHoursStart" -Value $startHour
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" -Name "ActiveHoursEnd" -Value $endHour
-```
-
-Tai padeda dar labiau apriboti, kada sistema gali bandyti perkrauti (jei vartotojas atsijungęs).
-
----
-
-Jei nori, galiu padėti su `.bat` failu, kuris paleidžia šį skriptą automatiškai po kiekvieno „feature update“. Ar tai būtų naudinga?
