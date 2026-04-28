@@ -19,6 +19,10 @@ python3 manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -
 ```
 scp vartotojas@serverio_ip:/kelias/iki/projekto/data.json E:\Duomenai\Kestys\Desktop\
 ```
+Štai komanda, kurią paleiskite savo Windows terminale (ne SSH viduje), kad parsisiųstumėte failą:
+```
+scp -P 2222 as@192.168.1.200:/home/as/Skaps_django_project/data.json E:\Duomenai\Kestys\Desktop\CodeAcademy\PythonProject\django_excel\
+```
 
 ### Išvalykite/Sukurkite SQLite bazę:
 ```
